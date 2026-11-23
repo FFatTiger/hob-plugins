@@ -23,7 +23,7 @@ class BwError extends Error {
 function reasonFrom(error, hidden = []) {
   const raw = String(error?.stderr || error?.message || error);
   const lines = raw
-    .split("\\n")
+    .split("\n")
     .map((line) => line.trim())
     .filter((line) => line && !line.startsWith("at ") && !line.startsWith("node:"));
   let reason = lines.slice(-2).join(" ") || "Bitwarden 命令失败";
@@ -111,22 +111,26 @@ function getLogins({ search, folder }) {
     .map((item) => credentialLogin(item, folders));
 }
 
-function loginLabel(login) {
+function hostOf(uri) {
+  try { return new URL(uri).host || uri; } catch { return uri; }
+}
+
+function loginLabel(login, separator = "、") {
   const contents = [];
   if (login.hasPassword) contents.push("密码");
   if (login.hasTotp) contents.push("两步验证");
-  return contents.length ? contents.join("、") : "无";
+  return contents.length ? contents.join(separator) : "无";
 }
 
+// 列表卡的一行：第一行名称，第二行用户名 · 网站的主机名；右边小字写存了哪些内容（Hob 把 interactive_container 里第一行当标题、后面的当灰色小字）
 function loginRow(login) {
   const username = login.username || "（无用户名）";
-  const uri = login.uris[0] || "（无网址）";
+  const uri = login.uris[0] ? hostOf(login.uris[0]) : "（无网址）";
   return {
-    tag: "column_set",
-    background_style: "light",
-    columns: [
-      { weight: 3, elements: [{ tag: "div", text: login.name }, { tag: "div", text: `${username} · ${uri}` }] },
-      { weight: 1, elements: [{ tag: "div", text: loginLabel(login) }] },
+    tag: "interactive_container",
+    elements: [
+      { tag: "div", text: `${login.name}\n${username} · ${uri}` },
+      { tag: "div", text: loginLabel(login, " · ") },
     ],
   };
 }
@@ -165,6 +169,12 @@ function valueOf(values, name) {
   return value === undefined || value === null ? "" : String(value);
 }
 
+/** 卡片里选的文件夹；选的是「不放进文件夹」就是空。 */
+function folderOf(values) {
+  const folder = valueOf(values, "folder");
+  return folder === NO_FOLDER ? "" : folder;
+}
+
 function savedCard(values, folder, status) {
   const name = valueOf(values, "name");
   const url = valueOf(values, "url");
@@ -180,11 +190,14 @@ function savedCard(values, folder, status) {
   return { header: { title: "保存登录信息" }, body: { elements } };
 }
 
+// 文件夹下拉里「不放进文件夹」那一项的 value：Hob 要求选项的 value 非空，回调时再换回空
+const NO_FOLDER = "__none__";
+
 function saveLoginCard({ name, url, username, folder } = {}) {
   const folders = listFolders();
   const options = [
     ...folders.filter((entry) => entry && typeof entry.name === "string").map((entry) => ({ text: entry.name, value: entry.name })),
-    { text: "不放进文件夹", value: "" },
+    { text: "不放进文件夹", value: NO_FOLDER },
   ];
   const folderInitial = folder && folders.some((entry) => entry.name === folder) ? { initial_option: folder } : {};
   return {
@@ -202,13 +215,8 @@ function saveLoginCard({ name, url, username, folder } = {}) {
           { tag: "input", name: "url", label: "网址", default_value: url || "", input_type: "text" },
           { tag: "input", name: "username", label: "用户名", default_value: username || "", input_type: "text" },
           { tag: "input", name: "password", label: "密码", required: true, input_type: "password", min_length: 10, generate: true },
-          { tag: "column_set", columns: [
-            { weight: 1, elements: [] },
-            { weight: 1, elements: [
-              { tag: "button", name: "cancel", text: "取消", type: "default", form_action_type: "reset" },
-              { tag: "button", name: "save", text: "保存", type: "primary_filled", form_action_type: "submit" },
-            ] },
-          ] },
+          { tag: "button", name: "cancel", text: "取消", type: "default" },
+          { tag: "button", name: "save", text: "保存", type: "primary_filled", form_action_type: "submit" },
         ],
       }],
     },
@@ -288,7 +296,7 @@ server.registerTool("list_logins", {
   const shown = logins.slice(0, 50);
   const lines = [`共 ${logins.length} 条`, ...shown.map((login) => `${login.name} · ${login.username} · ${login.uris[0] || ""} · ${login.folder || "无文件夹"} · 存了：${loginLabel(login)}`)];
   if (logins.length > 50) lines.push(`还有 ${logins.length - 50} 条，用 search 缩小范围`);
-  return textResult(lines.join("\\n"), { "hob/card": listCard(folder || "Bitwarden 里的登录", logins) });
+  return textResult(lines.join("\n"), { "hob/card": listCard(folder || "Bitwarden 里的登录", logins) });
 });
 
 server.registerTool("save_login", {
@@ -316,7 +324,7 @@ server.registerTool("save_login_submit", {
       uris: valueOf(values, "url") ? [valueOf(values, "url")] : [],
       username: valueOf(values, "username"),
       password,
-      folder: valueOf(values, "folder"),
+      folder: folderOf(values),
     });
     const folderText = result.folder;
     return textResult(`用户在 Bitwarden 存好了登录：${valueOf(values, "name")}（${valueOf(values, "username")}），文件夹「${folderText || ""}」。`, { "hob/card": savedCard(values, folderText) });
