@@ -166,7 +166,9 @@ test("五个凭据工具返回 structuredContent，支持取秘密、生成、�
     assert.deepEqual(secret.structuredContent, { username: "lin@example.com", password: LIST_SECRET, totp: "123456" });
 
     const generated = await client.callTool({ name: "credentials_generate", arguments: { length: 20, lowercase: true, uppercase: true, numbers: true, symbols: true } });
-    assert.deepEqual(generated.structuredContent, { password: "Generated-123!" });
+    assert.match(generated.structuredContent.password, /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*-])[A-Za-z\d!@#$%^&*-]{20}$/);
+    const alnumOnly = await client.callTool({ name: "credentials_generate", arguments: { length: 12, lowercase: true, uppercase: true, numbers: true, symbols: false } });
+    assert.match(alnumOnly.structuredContent.password, /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{12}$/);
 
     const saved = await client.callTool({ name: "credentials_save", arguments: {
       id: "login-forum", name: "Example 论坛", uris: ["https://forum.example.net/new-login"], username: "updated@example.com", password: "updated-secret", folder: "更新后的文件夹",

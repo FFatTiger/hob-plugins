@@ -23,7 +23,17 @@ if (sessionIndex >= 0) input.splice(sessionIndex, 2);
 const [command, subcommand, ...rest] = input;
 const db = load();
 
-if (command === "list" && subcommand === "folders") {
+// launch.mjs 的登录解锁流程：假 bw 不真的登录，只要答得出 status / config server / login --apikey / unlock
+if (command === "status") {
+  process.stdout.write(`${JSON.stringify({ status: "unauthenticated", serverUrl: null, lastSync: null })}\n`);
+} else if (command === "config" && subcommand === "server") {
+  process.stdout.write("\n");
+} else if (command === "login" && subcommand === "--apikey") {
+  if (!process.env.BW_CLIENTID || !process.env.BW_CLIENTSECRET) fail("缺少 API 密钥");
+} else if (command === "unlock" && subcommand === "--passwordenv") {
+  if (!process.env[rest[0]]) fail("缺少主密码");
+  process.stdout.write("fake-session\n");
+} else if (command === "list" && subcommand === "folders") {
   process.stdout.write(`${JSON.stringify(db.folders)}\n`);
 } else if (command === "list" && subcommand === "items") {
   const search = rest[rest.indexOf("--search") + 1] || "";
@@ -41,7 +51,13 @@ if (command === "list" && subcommand === "folders") {
   if (!db.items.some((entry) => entry.id === rest[0])) fail("没有这个登录");
   process.stdout.write("123456\n");
 } else if (command === "generate") {
-  process.stdout.write("Generated-123!\n");
+  // 照真 bw 的参数：--length N，--lowercase / --uppercase / --number / --special 各选一类；每类至少一个
+  const length = Number(rest[rest.indexOf("--length") + 1]) || 20;
+  const pools = [["--lowercase", "abcdefghijkmnpqrstuvwxyz"], ["--uppercase", "ABCDEFGHJKLMNPQRSTUVWXYZ"], ["--number", "23456789"], ["--special", "!@#$%^&*-"]].filter(([flag]) => rest.includes(flag)).map(([, pool]) => pool);
+  const chars = pools.map((pool) => pool[Math.floor(Math.random() * pool.length)]);
+  const all = pools.join("");
+  while (chars.length < length) chars.push(all[Math.floor(Math.random() * all.length)]);
+  process.stdout.write(`${chars.sort(() => Math.random() - 0.5).join("")}\n`);
 } else if (command === "create" && subcommand === "folder") {
   const folder = JSON.parse(rest[0]);
   const id = `folder-${db.folders.length + 1}`;
