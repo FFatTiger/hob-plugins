@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "bitwarden": {
+      "command": "node",
+      "args": ["${hob.plugin_root}/launch.mjs"],
+      "env": {
+        "BW_DATA": "${hob.plugin_data}",
+        "BW_SERVER": "${user_config.BW_SERVER}",
+        "BW_CLIENTID": "${user_config.BW_CLIENTID}",
+        "BW_CLIENTSECRET": "${user_config.BW_CLIENTSECRET}",
+        "BW_PASSWORD": "${user_config.BW_PASSWORD}"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "bitwarden",
+  "displayName": "Bitwarden",
+  "version": "1.0.0",
+  "description": "Look up, create and organize items in your Bitwarden vault through Bitwarden's official MCP server. Works with bitwarden.com, the EU cloud and self-hosted servers. Hob logs in with your API key and unlocks the vault with your master password; items the assistant reads are sent to your model provider.",
+  "homepage": "https://github.com/bitwarden/mcp-server",
+  "userConfig": {
+    "BW_SERVER": { "type": "string", "title": "服务器地址", "description": "私有部署填你的地址，例如 https://vault.example.com；EU 云填 https://vault.bitwarden.eu；用 bitwarden.com 留空。" },
+    "BW_CLIENTID": { "type": "string", "title": "API 密钥 client_id", "description": "网页版 设置 → 安全 → 密钥 → 查看 API 密钥。", "required": true },
+    "BW_CLIENTSECRET": { "type": "string", "title": "API 密钥 client_secret", "required": true, "sensitive": true },
+    "BW_PASSWORD": { "type": "string", "title": "主密码", "description": "用来解锁密码库，只交给本机的 Bitwarden 命令行。", "required": true, "sensitive": true }
+  },
+  "extensions": { "com.hob.plugins": { "icon": "icon.svg", "publisher": "Bitwarden", "categories": ["productivity"] } }
+}

@@ -36,6 +36,16 @@
         "mcp.json",
         "plugin.json"
       ]
+    },
+    {
+      "id": "bitwarden",
+      "path": "bitwarden",
+      "files": [
+        "icon.svg",
+        "launch.mjs",
+        "mcp.json",
+        "plugin.json"
+      ]
     }
   ]
 }
