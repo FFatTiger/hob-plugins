@@ -23,7 +23,11 @@ for (const key of ["BW_SERVER", "BW_CLIENTID", "BW_CLIENTSECRET", "BW_PASSWORD",
 const bw = (args, env = {}) => execFileSync(bin("bw"), args, { env: { ...base, ...env }, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 const run = (args, env, what) => {
   try { return bw(args, env); }
-  catch (error) { fail(`${what}失败：${String(error.stderr || error.message).trim()}`); }
+  catch (error) {
+    // bw 出错会带一大段调用栈，只留说原因的那几行
+    const reason = String(error.stderr || error.message).split("\n").map((line) => line.trim()).filter((line) => line && !line.startsWith("at ")).slice(-2).join(" ");
+    fail(`${what}失败：${reason}`);
+  }
 };
 
 const server = (BW_SERVER || "https://vault.bitwarden.com").replace(/\/+$/, "");
