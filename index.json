@@ -44,7 +44,10 @@
         "icon.svg",
         "launch.mjs",
         "mcp.json",
-        "plugin.json"
+        "plugin.json",
+        "server.mjs",
+        "test/fixtures/fake-bw.mjs",
+        "test/test.mjs"
       ]
     }
   ]
