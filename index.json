@@ -27,6 +27,15 @@
         "mcp.json",
         "plugin.json"
       ]
+    },
+    {
+      "id": "cloudflare",
+      "path": "cloudflare",
+      "files": [
+        "icon.svg",
+        "mcp.json",
+        "plugin.json"
+      ]
     }
   ]
 }

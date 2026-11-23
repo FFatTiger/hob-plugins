@@ -1,0 +1,8 @@
+{
+  "name": "cloudflare",
+  "displayName": "Cloudflare",
+  "version": "1.0.0",
+  "description": "Manage DNS, Workers, R2, D1 and the rest of your Cloudflare account through Cloudflare's official API MCP server. Sign in with your Cloudflare account; no token needed.",
+  "homepage": "https://github.com/cloudflare/mcp",
+  "extensions": { "com.hob.plugins": { "icon": "icon.svg", "publisher": "Cloudflare", "categories": ["development"] } }
+}
