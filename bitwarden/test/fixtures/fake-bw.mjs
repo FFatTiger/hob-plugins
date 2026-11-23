@@ -64,6 +64,13 @@ if (command === "list" && subcommand === "folders") {
   db.items[index] = { ...replacement, id };
   save(db);
   process.stdout.write(`${JSON.stringify(db.items[index])}\n`);
+} else if (command === "delete" && subcommand === "item") {
+  const id = rest[0];
+  const index = db.items.findIndex((entry) => entry.id === id);
+  if (index < 0) fail("没有这个登录");
+  db.items.splice(index, 1);
+  save(db);
+  process.stdout.write("{}\n");
 } else if (command === "sync") {
   process.stdout.write("{}\n");
 } else {

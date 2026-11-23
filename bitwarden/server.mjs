@@ -272,6 +272,13 @@ function getSecret(id) {
   return secret;
 }
 
+function deleteCredential(id) {
+  getItem(id);
+  runBw(["delete", "item", id, "--permanent"], [id]);
+  runBw(["sync"]);
+  return {};
+}
+
 const appOnly = (role) => ({ ui: { visibility: ["app"] }, "hob/credentials": role });
 const emptyObject = z.object({});
 const loginInput = z.object({ search: z.string().optional(), folder: z.string().optional() });
@@ -341,6 +348,7 @@ server.registerTool("credentials_generate", { inputSchema: generateInput, _meta:
   return emptyResult({ password: runBw(args) });
 });
 server.registerTool("credentials_save", { inputSchema: saveInput, _meta: appOnly("save") }, async (values) => emptyResult(saveCredential(values)));
+server.registerTool("credentials_delete", { inputSchema: secretInput, _meta: appOnly("delete") }, async ({ id }) => emptyResult(deleteCredential(id)));
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

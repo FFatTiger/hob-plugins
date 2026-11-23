@@ -81,10 +81,10 @@ test("暴露的工具、app-only visibility 和凭据角色正确", async () => 
   await withClient({}, async (client) => {
     const tools = (await client.listTools()).tools;
     assert.deepEqual(tools.map((tool) => tool.name).sort(), [
-      "credentials_generate", "credentials_list", "credentials_save", "credentials_secret",
+      "credentials_delete", "credentials_generate", "credentials_list", "credentials_save", "credentials_secret",
       "list_logins", "save_login", "save_login_submit",
     ].sort());
-    for (const role of ["list", "secret", "generate", "save"]) {
+    for (const role of ["list", "secret", "generate", "save", "delete"]) {
       const tool = tools.find((entry) => entry._meta?.["hob/credentials"] === role);
       assert.ok(tool);
       assert.deepEqual(tool._meta.ui.visibility, ["app"]);
@@ -155,7 +155,7 @@ test("save_login 出表单，回调支持取消、保存、重复和错误", asy
   });
 });
 
-test("四个凭据工具返回 structuredContent，支持取秘密、生成和更新", async () => {
+test("五个凭据工具返回 structuredContent，支持取秘密、生成、更新和删除", async () => {
   await withClient({}, async (client, db) => {
     const listed = await client.callTool({ name: "credentials_list", arguments: {} });
     assert.deepEqual(listed.content, []);
@@ -178,5 +178,9 @@ test("四个凭据工具返回 structuredContent，支持取秘密、生成和�
     assert.equal(updated.login.totp, "otpauth://totp/example");
     assert.equal(updated.login.extraField, "preserve me");
     assert.equal(updated.login.password, "updated-secret");
+
+    const deleted = await client.callTool({ name: "credentials_delete", arguments: { id: "login-social" } });
+    assert.deepEqual(deleted.structuredContent ?? {}, {});
+    assert.ok(!JSON.parse(readFileSync(db, "utf8")).items.some((item) => item.id === "login-social"));
   });
 });
