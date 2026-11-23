@@ -175,18 +175,15 @@ function folderOf(values) {
   return folder === NO_FOLDER ? "" : folder;
 }
 
+// 结果行：标签栏窄、值栏宽（Hob 按 weight 分栏）；最后一句用 Hob 的结果行（勾 + 灰字）
 function savedCard(values, folder, status) {
   const name = valueOf(values, "name");
   const url = valueOf(values, "url");
   const username = valueOf(values, "username");
   const password = valueOf(values, "password");
-  const elements = [
-    { tag: "column_set", background_style: "light", columns: [{ weight: 1, elements: [{ tag: "div", text: "名称" }] }, { weight: 2, elements: [{ tag: "div", text: name }] }] },
-    { tag: "column_set", background_style: "light", columns: [{ weight: 1, elements: [{ tag: "div", text: "网址" }] }, { weight: 2, elements: [{ tag: "div", text: url || "（没填）" }] }] },
-    { tag: "column_set", background_style: "light", columns: [{ weight: 1, elements: [{ tag: "div", text: "用户名" }] }, { weight: 2, elements: [{ tag: "div", text: username || "（没填）" }] }] },
-    { tag: "column_set", background_style: "light", columns: [{ weight: 1, elements: [{ tag: "div", text: "密码" }] }, { weight: 2, elements: [{ tag: "div", text: password ? "已填写" : "未填写" }] }] },
-  ];
-  elements.push({ tag: "div", text: status || (folder ? `✓ 已保存到「${folder}」` : "✓ 已保存") });
+  const row = (label, value) => ({ tag: "column_set", background_style: "light", columns: [{ weight: 1, elements: [{ tag: "div", text: label }] }, { weight: 5, elements: [{ tag: "div", text: value }] }] });
+  const elements = [row("名称", name), row("网址", url || "（没填）"), row("用户名", username || "（没填）"), row("密码", password ? "已填写" : "未填写")];
+  elements.push({ tag: "div", icon: "check", text: status || (folder ? `已保存到「${folder}」` : "已保存") });
   return { header: { title: "保存登录信息" }, body: { elements } };
 }
 
@@ -210,7 +207,7 @@ function saveLoginCard({ name, url, username, folder } = {}) {
         elements: [
           { tag: "column_set", columns: [
             { weight: 1, elements: [{ tag: "input", name: "name", label: "名称", default_value: name || "", required: true }] },
-            { weight: 1, elements: [{ tag: "select_static", name: "folder", label: "文件夹", options, placeholder: "不放进文件夹", ...folderInitial }] },
+            { weight: 1, elements: [{ tag: "select_static", name: "folder", label: "文件夹", options, placeholder: "不放进文件夹", display: "dropdown", ...folderInitial }] },
           ] },
           { tag: "input", name: "url", label: "网址", default_value: url || "", input_type: "text" },
           { tag: "input", name: "username", label: "用户名", default_value: username || "", input_type: "text" },
