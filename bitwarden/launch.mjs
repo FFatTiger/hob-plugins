@@ -1,8 +1,7 @@
 // 登录并解锁 Bitwarden，再启动本插件的 MCP 服务。命令行的数据放在插件数据目录，不碰本机已有的 Bitwarden 配置。
-import { execFileSync, spawn } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 const VERSIONS = { "@bitwarden/cli": "2026.11.0", "@modelcontextprotocol/sdk": "1.32.2" };
 const { BW_DATA, BW_SERVER, BW_CLIENTID, BW_CLIENTSECRET, BW_PASSWORD, BW_CLI_PATH: externalCli, BW_MCP_SDK_ROOT: externalSdk } = process.env;
@@ -48,6 +47,8 @@ if (status.status === "unauthenticated") {
 }
 const session = run(["unlock", "--passwordenv", "BW_PASSWORD", "--raw"], { BW_PASSWORD }, "用主密码解锁");
 
-const child = spawn(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), "server.mjs")], { env: { ...base, BW_SESSION: session, BW_CLI_PATH: bwBin, BW_MCP_SDK_ROOT: sdkRoot }, stdio: "inherit" });
-child.on("exit", (code, signal) => process.exit(signal ? 1 : code ?? 0));
-for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => child.kill(sig));
+for (const key of ["BW_SERVER", "BW_CLIENTID", "BW_CLIENTSECRET", "BW_PASSWORD", "BW_DATA", "BW_CLI_PATH", "BW_MCP_SDK_ROOT"]) delete process.env[key];
+process.env.BW_SESSION = session;
+process.env.BW_CLI_PATH = bwBin;
+process.env.BW_MCP_SDK_ROOT = sdkRoot;
+await import("./server.mjs");
