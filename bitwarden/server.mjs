@@ -287,7 +287,7 @@ const secretInput = z.object({ id: z.string() });
 const generateInput = z.object({ length: z.number(), lowercase: z.boolean(), uppercase: z.boolean(), numbers: z.boolean(), symbols: z.boolean() });
 const saveInput = z.object({ id: z.string().optional(), name: z.string(), uris: z.array(z.string()), username: z.string(), password: z.string(), folder: z.string().optional() });
 
-const server = new McpServer({ name: "bitwarden", version: "2.0.0" }, { capabilities: { tools: {} } });
+const server = new McpServer({ name: "bitwarden", version: "2.0.2" }, { capabilities: { tools: {} } });
 
 server.registerTool("list_logins", {
   description: "列出 Bitwarden 里存的登录：名称、用户名、网址、所在文件夹、存了哪些内容（密码、两步验证）。不返回密码。参数 search 按名称、用户名或网址筛选，folder 只看某个文件夹，都可以不填。结果同时显示成一张列表卡给用户看。",
