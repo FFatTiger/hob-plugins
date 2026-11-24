@@ -1,0 +1,80 @@
+{
+  "name": "chatgpt",
+  "displayName": "ChatGPT 订阅 (Codex)",
+  "version": "1.0.0",
+  "description": "使用你的 ChatGPT Plus / Pro 订阅（经由 Codex OAuth）调用 GPT-5 / Codex 系列模型，支持远程粘贴回调地址登录。",
+  "homepage": "https://github.com/numman-ali/opencode-openai-codex-auth",
+  "extensions": {
+    "com.hob.plugins": {
+      "icon": "icon.svg",
+      "publisher": "numman-ali",
+      "sourceUrl": "https://github.com/numman-ali/opencode-openai-codex-auth",
+      "categories": ["providers"],
+      "unofficial": true,
+      "reviewedVersion": "4.4.0",
+      "summary": {
+        "zh": "用 ChatGPT Plus/Pro 订阅调用 Codex 模型，支持浏览器 OAuth 与远程粘贴回调。",
+        "en": "Use your ChatGPT Plus/Pro subscription for Codex models via OAuth with loopback paste support."
+      },
+      "description": {
+        "zh": "通过与 OpenAI Codex CLI 相同的 OAuth PKCE 流程登录 ChatGPT Plus / Pro 订阅账号，在 Hob 中使用 GPT-5 / Codex 模型。远程使用 Hob 时可粘贴浏览器最终停住的回调地址完成登录。",
+        "en": "Sign in to your ChatGPT Plus/Pro subscription using OAuth PKCE to access GPT-5 and Codex models. Supports pasting the final loopback callback URL when Hob runs on a remote host."
+      },
+      "risk": {
+        "zh": "非官方社区维护插件。非官方接入可能导致账号被厂商限制或封禁；OAuth 回调会在运行 Hob 的机器上短暂监听本机端口 1455。",
+        "en": "Unofficial community-maintained plugin. Unofficial access may result in account restrictions or suspension; OAuth callback briefly listens on local port 1455 on the Hob host."
+      },
+      "permissions": ["network", "browser_callback", "bun_runtime"],
+      "providerConfig": {
+        "openai": {
+          "name": "ChatGPT (Codex)",
+          "npm": "@ai-sdk/openai",
+          "models": {
+            "gpt-5.2": {
+              "name": "GPT 5.2 (Codex)",
+              "api": { "id": "gpt-5.2", "npm": "@ai-sdk/openai" },
+              "limit": { "context": 272000, "output": 128000 },
+              "modalities": { "input": ["text", "image"], "output": ["text"] },
+              "variants": { "none": {}, "low": {}, "medium": {}, "high": {}, "xhigh": {} }
+            },
+            "gpt-5.2-codex": {
+              "name": "GPT 5.2 Codex",
+              "api": { "id": "gpt-5.2-codex", "npm": "@ai-sdk/openai" },
+              "limit": { "context": 272000, "output": 128000 },
+              "modalities": { "input": ["text", "image"], "output": ["text"] },
+              "variants": { "low": {}, "medium": {}, "high": {}, "xhigh": {} }
+            },
+            "gpt-5.1-codex-max": {
+              "name": "GPT 5.1 Codex Max",
+              "api": { "id": "gpt-5.1-codex-max", "npm": "@ai-sdk/openai" },
+              "limit": { "context": 272000, "output": 128000 },
+              "modalities": { "input": ["text", "image"], "output": ["text"] },
+              "variants": { "low": {}, "medium": {}, "high": {}, "xhigh": {} }
+            },
+            "gpt-5.1-codex": {
+              "name": "GPT 5.1 Codex",
+              "api": { "id": "gpt-5.1-codex", "npm": "@ai-sdk/openai" },
+              "limit": { "context": 272000, "output": 128000 },
+              "modalities": { "input": ["text", "image"], "output": ["text"] },
+              "variants": { "low": {}, "medium": {}, "high": {} }
+            },
+            "gpt-5.1-codex-mini": {
+              "name": "GPT 5.1 Codex Mini",
+              "api": { "id": "gpt-5.1-codex-mini", "npm": "@ai-sdk/openai" },
+              "limit": { "context": 272000, "output": 128000 },
+              "modalities": { "input": ["text", "image"], "output": ["text"] },
+              "variants": { "medium": {}, "high": {} }
+            }
+          }
+        }
+      },
+      "providers": [
+        {
+          "package": "opencode-openai-codex-auth",
+          "version": "4.4.0",
+          "integrity": "sha512-sRmcbAAIMHH38wPgQLQB0n1WzQPN7R+kegXgyKWQgRb65+PKbeum8fgbrQelUaESVc7ibBJ9mKLCfI58mBTjOg=="
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "zcode",
+  "displayName": "ZCode (GLM 编程套餐)",
+  "version": "1.0.0",
+  "description": "接入 Z.ai 与智谱（BigModel）GLM 编程套餐、团队席位及 ZCode Start Plan，支持网页登录、API 密钥和额度窗口。",
+  "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/zcode",
+  "extensions": {
+    "com.hob.plugins": {
+      "icon": "icon.svg",
+      "publisher": "magpie-community",
+      "sourceUrl": "https://github.com/magpie-community/plugins/tree/main/packages/zcode",
+      "categories": ["providers"],
+      "unofficial": true,
+      "reviewedVersion": "0.1.69",
+      "summary": {
+        "zh": "接入 Z.ai / 智谱 GLM 编程套餐与团队席位，支持网页登录与额度查询。",
+        "en": "Connect Z.ai and BigModel GLM Coding Plan, team seats, and Start Plan with web sign-in and quota windows."
+      },
+      "description": {
+        "zh": "接入 Z.ai 和智谱 BigModel 的 GLM Coding Plan、团队席位及免费 Start Plan。支持网页服务端轮询登录、本机 ZCode 客户端登录复用和 API 密钥登录，可查看额度窗口。",
+        "en": "Connect Z.ai and BigModel GLM Coding Plan, team seats, and free Start Plan. Supports web polling OAuth, local ZCode app sign-in reuse, API keys, and quota windows."
+      },
+      "risk": {
+        "zh": "非官方社区维护插件。非官方接入可能导致账号被厂商限制或封禁；选择复用 ZCode 客户端登录时会读取运行 Hob 机器上的本机凭据文件。",
+        "en": "Unofficial community-maintained plugin. Unofficial access may lead to account limits or suspension; using the local ZCode app sign-in option reads local credentials on the Hob host machine."
+      },
+      "permissions": ["network", "local_credentials", "bun_runtime"],
+      "providers": [
+        {
+          "package": "@magpie-community/opencode-zcode-auth",
+          "version": "0.1.69",
+          "integrity": "sha512-AkAhufoQVtjEp6YakIas1yf4MK0n6LK0/FyjYkMmE95hUYCME2NmkPGkI9LJ6Pksx9Y7BMQy+TDyBIBgO8zgpw=="
+        }
+      ]
+    }
+  }
+}

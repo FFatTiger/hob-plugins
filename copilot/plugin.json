@@ -1,0 +1,38 @@
+{
+  "name": "copilot",
+  "displayName": "GitHub Copilot",
+  "version": "1.0.0",
+  "description": "使用你的 GitHub Copilot 订阅（GitHub.com 或 GitHub Enterprise）作为模型，支持设备码登录和额度查看。",
+  "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/copilot",
+  "extensions": {
+    "com.hob.plugins": {
+      "icon": "icon.svg",
+      "publisher": "magpie-community",
+      "sourceUrl": "https://github.com/magpie-community/plugins/tree/main/packages/copilot",
+      "categories": ["providers"],
+      "unofficial": true,
+      "reviewedVersion": "0.1.2",
+      "summary": {
+        "zh": "通过 GitHub Copilot 订阅使用模型，设备码登录，可看额度窗口。",
+        "en": "Use models from your GitHub Copilot subscription (GitHub.com or Enterprise) via device-code sign-in with quota tracking."
+      },
+      "description": {
+        "zh": "接入 GitHub.com 与 GitHub Enterprise 的 GitHub Copilot 订阅模型，使用设备码登录并自动刷新短期推理令牌，支持查看高级请求或积分余量与重置日期。",
+        "en": "Connect GitHub Copilot on GitHub.com or GitHub Enterprise using device-code OAuth sign-in, automatic short-lived token refresh, and premium request or credit allowance visibility."
+      },
+      "risk": {
+        "zh": "非官方社区维护插件。通过第三方客户端接入订阅可能违反厂商条款并导致账号受限或封禁；额度接口为非公开接口，可能随上游变更而失效。",
+        "en": "Unofficial community-maintained plugin. Using a subscription through a third-party host may violate vendor terms and risk account restriction or suspension; quota reads rely on internal endpoints that may change."
+      },
+      "permissions": ["network", "bun_runtime"],
+      "providers": [
+        {
+          "package": "@magpie-community/opencode-copilot-auth",
+          "version": "0.1.2",
+          "integrity": "sha512-fXuKvcdMe6eL27cd8vsH5QHzjf8e/Sadj33ER+LPyPA5DvqcJGsWMN/s4tbsFpbb/6n4a3d4R+UgGF1AZlp3Ag==",
+          "tarball": "https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-copilot-auth-0.1.2.tgz"
+        }
+      ]
+    }
+  }
+}

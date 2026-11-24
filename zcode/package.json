@@ -1,0 +1,8 @@
+{
+  "name": "hob-plugin-zcode",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@magpie-community/opencode-zcode-auth": "0.1.69"
+  }
+}

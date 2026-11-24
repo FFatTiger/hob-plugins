@@ -1,0 +1,38 @@
+{
+  "name": "agy-cli",
+  "displayName": "Antigravity (本机 agy CLI)",
+  "version": "1.0.0",
+  "description": "通过运行 Hob 机器上的本机 agy CLI（ACP 协议）接入 Antigravity 订阅模型，支持检测/代装 CLI 与查看额度。",
+  "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/agy-cli",
+  "extensions": {
+    "com.hob.plugins": {
+      "icon": "icon.svg",
+      "publisher": "magpie-community",
+      "sourceUrl": "https://github.com/magpie-community/plugins/tree/main/packages/agy-cli",
+      "categories": ["providers"],
+      "unofficial": true,
+      "reviewedVersion": "0.1.115",
+      "summary": {
+        "zh": "走运行 Hob 机器上的本机 agy CLI 接入 Antigravity 订阅模型。",
+        "en": "Connect Antigravity subscription models through the local agy CLI installed on the Hob host machine."
+      },
+      "description": {
+        "zh": "通过运行 Hob 机器上的真实 agy CLI（`agy acp`）转发请求，使用 Antigravity 订阅模型并查看额度窗口。未安装 agy CLI 时可一键触发安装。",
+        "en": "Routes requests through the local agy CLI (`agy acp`) on the Hob host machine to use Antigravity subscription models and check quota windows. Can install the agy CLI if not present."
+      },
+      "risk": {
+        "zh": "非官方社区维护插件。需要在本机启动 agy CLI 子进程并读取运行 Hob 那台机器上的本机登录状态，不是你当前浏览器设备的登录；非官方接入存在被厂商限制或封禁的风险。",
+        "en": "Unofficial community-maintained plugin. Spawns the local agy CLI subprocess and reads local login state on the Hob host machine (not your browser device); unofficial access carries vendor restriction risk."
+      },
+      "permissions": ["network", "subprocess", "local_credentials", "bun_runtime"],
+      "providers": [
+        {
+          "package": "@magpie-community/opencode-agy-cli-auth",
+          "version": "0.1.115",
+          "integrity": "sha512-d5N+CS6rvGWDxiKS4YX//LkHz9iYEnYk/tA3AWhAj/O4/A6T/REwvdABEEC1rknekFJERUaYTJ6Kd96qdq/nYw==",
+          "tarball": "https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-agy-cli-auth-0.1.115.tgz"
+        }
+      ]
+    }
+  }
+}

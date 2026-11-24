@@ -1,0 +1,8 @@
+{
+  "name": "hob-plugin-chatgpt",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "opencode-openai-codex-auth": "4.4.0"
+  }
+}

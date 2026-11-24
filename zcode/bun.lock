@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "hob-plugin-zcode",
+      "dependencies": {
+        "@magpie-community/opencode-zcode-auth": "0.1.69",
+      },
+    },
+  },
+  "packages": {
+    "@magpie-community/opencode-zcode-auth": ["@magpie-community/opencode-zcode-auth@0.1.69", "", {}, "sha512-AkAhufoQVtjEp6YakIas1yf4MK0n6LK0/FyjYkMmE95hUYCME2NmkPGkI9LJ6Pksx9Y7BMQy+TDyBIBgO8zgpw=="],
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "zen-free",
+  "displayName": "OpenCode Zen Free",
+  "version": "1.0.0",
+  "description": "使用公共免登录凭证接入 OpenCode Zen 免费模型，自动发现当前免费模型并支持流式对话和工具调用。",
+  "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/zen-free",
+  "extensions": {
+    "com.hob.plugins": {
+      "icon": "icon.svg",
+      "publisher": "magpie-community",
+      "sourceUrl": "https://github.com/magpie-community/plugins/tree/main/packages/zen-free",
+      "categories": ["providers"],
+      "unofficial": true,
+      "reviewedVersion": "0.1.28",
+      "summary": {
+        "zh": "免登录接入 OpenCode Zen 免费模型，自动发现当前免费列表。",
+        "en": "Access OpenCode Zen free models with the public credential, automatic discovery, and native streaming."
+      },
+      "description": {
+        "zh": "使用公共凭证（public）接入 OpenCode Zen 当前提供的免费模型，无需个人 API 密钥。自动发现模型目录，支持原生流式协议与工具调用。",
+        "en": "Access free models currently offered on OpenCode Zen using the public credential without a personal API key. Automatically discovers available free models with native streaming and tool calls."
+      },
+      "risk": {
+        "zh": "非官方社区维护插件。免费模型列表与可用性由上游服务决定，随时可能调整；首次安装需下载 Bun 运行环境。",
+        "en": "Unofficial community-maintained plugin. Free model availability is controlled by the upstream service and may change at any time; first installation downloads the Bun runtime."
+      },
+      "permissions": ["network", "bun_runtime"],
+      "providers": [
+        {
+          "package": "@magpie-community/opencode-zen-free-auth",
+          "version": "0.1.28",
+          "integrity": "sha512-ytUerkExVwP52+ZHAjgdDmvnxE0cBKBwiPtRxrEOOgiq00C8nrXSXzsdBH+Yowgxgvr6C0hB0t/8jhcGqa6X9A=="
+        }
+      ]
+    }
+  }
+}
