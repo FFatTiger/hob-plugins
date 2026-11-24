@@ -114,7 +114,7 @@ test("save_login 出表单，回调支持取消、保存、重复和错误", asy
     assert.equal(card.config.callback_tool, "save_login_submit");
     const inputs = JSON.stringify(card);
     assert.match(inputs, /"input_type":"password"/);
-    assert.match(inputs, /"min_length":10/);
+    assert.doesNotMatch(inputs, /min_length/);
     assert.match(inputs, /"generate":true/);
     assert.match(inputs, /"论坛账号"/);
     assert.ok(!inputs.includes(LIST_SECRET));
