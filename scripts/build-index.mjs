@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { lstatSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -37,6 +37,15 @@ for (const entry of readdirSync(root, { withFileTypes: true }).sort((a, b) => a.
       if (!isObject(p) || typeof p.package !== "string" || !p.package || typeof p.version !== "string" || !p.version || typeof p.integrity !== "string" || !p.integrity.startsWith("sha512-")) {
         throw new Error(`Invalid provider declaration: ${entry.name}`);
       }
+    }
+    const packagePath = join(dirRoot, "package.json");
+    const lockPath = join(dirRoot, "bun.lock");
+    if (!existsSync(packagePath) || !existsSync(lockPath)) throw new Error(`Provider plugin needs package.json and bun.lock: ${entry.name}`);
+    const packageManifest = json(packagePath);
+    const dependencies = isObject(packageManifest.dependencies) ? packageManifest.dependencies : {};
+    const expected = Object.fromEntries(providers.map(p => [p.package, p.tarball ?? p.version]));
+    if (JSON.stringify(Object.keys(dependencies).sort()) !== JSON.stringify(Object.keys(expected).sort()) || Object.entries(expected).some(([name, version]) => dependencies[name] !== version)) {
+      throw new Error(`Provider dependencies do not match plugin.json: ${entry.name}`);
     }
   }
   const mcpPath = join(dirRoot, "mcp.json");

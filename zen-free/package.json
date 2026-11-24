@@ -1,0 +1,8 @@
+{
+  "name": "hob-plugin-zen-free",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@magpie-community/opencode-zen-free-auth": "0.1.28"
+  }
+}

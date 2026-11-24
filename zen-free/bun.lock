@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "hob-plugin-zen-free",
+      "dependencies": {
+        "@magpie-community/opencode-zen-free-auth": "0.1.28",
+      },
+    },
+  },
+  "packages": {
+    "@magpie-community/opencode-zen-free-auth": ["@magpie-community/opencode-zen-free-auth@0.1.28", "", {}, "sha512-ytUerkExVwP52+ZHAjgdDmvnxE0cBKBwiPtRxrEOOgiq00C8nrXSXzsdBH+Yowgxgvr6C0hB0t/8jhcGqa6X9A=="],
+  }
+}

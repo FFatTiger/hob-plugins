@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "hob-plugin-copilot",
+      "dependencies": {
+        "@magpie-community/opencode-copilot-auth": "https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-copilot-auth-0.1.2.tgz",
+      },
+    },
+  },
+  "packages": {
+    "@magpie-community/opencode-copilot-auth": ["@magpie-community/opencode-copilot-auth@https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-copilot-auth-0.1.2.tgz", {}, "sha512-fXuKvcdMe6eL27cd8vsH5QHzjf8e/Sadj33ER+LPyPA5DvqcJGsWMN/s4tbsFpbb/6n4a3d4R+UgGF1AZlp3Ag=="],
+  }
+}

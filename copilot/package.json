@@ -1,0 +1,8 @@
+{
+  "name": "hob-plugin-copilot",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@magpie-community/opencode-copilot-auth": "https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-copilot-auth-0.1.2.tgz"
+  }
+}

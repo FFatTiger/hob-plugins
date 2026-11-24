@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "hob-plugin-agy-cli",
+      "dependencies": {
+        "@magpie-community/opencode-agy-cli-auth": "https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-agy-cli-auth-0.1.115.tgz",
+      },
+    },
+  },
+  "packages": {
+    "@magpie-community/opencode-agy-cli-auth": ["@magpie-community/opencode-agy-cli-auth@https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-agy-cli-auth-0.1.115.tgz", {}, "sha512-d5N+CS6rvGWDxiKS4YX//LkHz9iYEnYk/tA3AWhAj/O4/A6T/REwvdABEEC1rknekFJERUaYTJ6Kd96qdq/nYw=="],
+  }
+}
