@@ -49,6 +49,46 @@
         "test/fixtures/fake-bw.mjs",
         "test/test.mjs"
       ]
+    },
+    {
+      "id": "agy-cli",
+      "path": "agy-cli",
+      "files": [
+        "icon.svg",
+        "plugin.json"
+      ]
+    },
+    {
+      "id": "chatgpt",
+      "path": "chatgpt",
+      "files": [
+        "icon.svg",
+        "plugin.json"
+      ]
+    },
+    {
+      "id": "copilot",
+      "path": "copilot",
+      "files": [
+        "icon.svg",
+        "plugin.json"
+      ]
+    },
+    {
+      "id": "zcode",
+      "path": "zcode",
+      "files": [
+        "icon.svg",
+        "plugin.json"
+      ]
+    },
+    {
+      "id": "zen-free",
+      "path": "zen-free",
+      "files": [
+        "icon.svg",
+        "plugin.json"
+      ]
     }
   ]
 }
