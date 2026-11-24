@@ -22,6 +22,8 @@ const sessionIndex = input.indexOf("--session");
 if (sessionIndex >= 0) input.splice(sessionIndex, 2);
 const [command, subcommand, ...rest] = input;
 const db = load();
+// 真 bw 按 BITWARDENCLI_APPDATA_DIR 找登录状态：启动器给的数据目录没传到，就和真 bw 一样答「没登录」
+if (process.env.BW_FAKE_APPDATA && process.env.BITWARDENCLI_APPDATA_DIR !== process.env.BW_FAKE_APPDATA) fail("You are not logged in.");
 
 // launch.mjs 的登录解锁流程：假 bw 不真的登录，只要答得出 status / config server / login --apikey / unlock
 if (command === "status") {

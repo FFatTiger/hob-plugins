@@ -48,6 +48,8 @@ if (status.status === "unauthenticated") {
 const session = run(["unlock", "--passwordenv", "BW_PASSWORD", "--raw"], { BW_PASSWORD }, "用主密码解锁");
 
 for (const key of ["BW_SERVER", "BW_CLIENTID", "BW_CLIENTSECRET", "BW_PASSWORD", "BW_DATA", "BW_CLI_PATH", "BW_MCP_SDK_ROOT"]) delete process.env[key];
+// MCP 服务和启动器同一进程：之后它调的命令行也要用插件自己的数据目录，不然会落到本机默认的 Bitwarden 配置里，显示没登录
+process.env.BITWARDENCLI_APPDATA_DIR = base.BITWARDENCLI_APPDATA_DIR;
 process.env.BW_SESSION = session;
 process.env.BW_CLI_PATH = bwBin;
 process.env.BW_MCP_SDK_ROOT = sdkRoot;

@@ -58,7 +58,7 @@ async function withClient(options, callback) {
       BW_CLI_PATH: fixture,
       BW_FAKE_DB: db,
       BW_MCP_SDK_ROOT: sdkRoot,
-      ...(options?.launcher ? { BW_DATA: root, BW_CLIENTID: "fake-client", BW_CLIENTSECRET: "fake-secret", BW_PASSWORD: "fake-password" } : {}),
+      ...(options?.launcher ? { BW_DATA: root, BW_FAKE_APPDATA: join(root, "bw"), BW_CLIENTID: "fake-client", BW_CLIENTSECRET: "fake-secret", BW_PASSWORD: "fake-password" } : {}),
       BW_SESSION: "fake-session",
       ...(options?.fail ? { BW_FAKE_FAIL: "1" } : {}),
     },
@@ -78,10 +78,12 @@ function resultJson(result) {
   return JSON.stringify(result);
 }
 
-test("启动器在同一进程内运行 MCP 服务", async () => {
+test("启动器在同一进程内运行 MCP 服务，之后的命令行调用仍用插件自己的数据目录", async () => {
   await withClient({ launcher: true }, async (client) => {
     const tools = (await client.listTools()).tools;
     assert.ok(tools.some((tool) => tool.name === "list_logins"));
+    const result = await client.callTool({ name: "list_logins", arguments: {} });
+    assert.match(result.content[0].text, /共 3 条/);
   });
 });
 test("暴露的工具、app-only visibility 和凭据角色正确", async () => {
