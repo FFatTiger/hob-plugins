@@ -1,7 +1,7 @@
 {
   "name": "zcode",
   "displayName": "ZCode (GLM 编程套餐)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "接入 Z.ai 与智谱（BigModel）GLM 编程套餐、团队席位及 ZCode Start Plan，支持网页登录、API 密钥和额度窗口。",
   "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/zcode",
   "extensions": {

@@ -1,7 +1,7 @@
 {
   "name": "chatgpt",
   "displayName": "ChatGPT 订阅 (Codex)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "使用你的 ChatGPT Plus / Pro 订阅（经由 Codex OAuth）调用 GPT-5 / Codex 系列模型，支持远程粘贴回调地址登录。",
   "homepage": "https://github.com/numman-ali/opencode-openai-codex-auth",
   "extensions": {

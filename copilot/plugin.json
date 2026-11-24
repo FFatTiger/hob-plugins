@@ -1,7 +1,7 @@
 {
   "name": "copilot",
   "displayName": "GitHub Copilot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "使用你的 GitHub Copilot 订阅（GitHub.com 或 GitHub Enterprise）作为模型，支持设备码登录和额度查看。",
   "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/copilot",
   "extensions": {

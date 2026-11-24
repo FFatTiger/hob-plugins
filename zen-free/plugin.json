@@ -1,7 +1,7 @@
 {
   "name": "zen-free",
   "displayName": "OpenCode Zen Free",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "使用公共免登录凭证接入 OpenCode Zen 免费模型，自动发现当前免费模型并支持流式对话和工具调用。",
   "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/zen-free",
   "extensions": {

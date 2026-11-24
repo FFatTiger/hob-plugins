@@ -1,7 +1,7 @@
 {
   "name": "agy-cli",
   "displayName": "Antigravity (本机 agy CLI)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "通过运行 Hob 机器上的本机 agy CLI（ACP 协议）接入 Antigravity 订阅模型，支持检测/代装 CLI 与查看额度。",
   "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/agy-cli",
   "extensions": {
