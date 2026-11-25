@@ -15,12 +15,58 @@ function errorToolResult(message) {
   };
 }
 
+function structuredToolResult(structuredContent) {
+  return {
+    content: [],
+    structuredContent,
+  };
+}
+
+const LOGIN_TOOLS = [
+  {
+    name: "hob_login_status",
+    description: "Check GitHub hob-bot sign-in status.",
+    inputSchema: { type: "object", properties: {} },
+    _meta: { ui: { visibility: ["app"] }, "hob/login": "status" },
+  },
+  {
+    name: "hob_login_start",
+    description: "Start GitHub hob-bot device-code sign-in.",
+    inputSchema: { type: "object", properties: {} },
+    _meta: { ui: { visibility: ["app"] }, "hob/login": "start" },
+  },
+  {
+    name: "hob_login_poll",
+    description: "Poll GitHub hob-bot device-code sign-in.",
+    inputSchema: { type: "object", properties: {} },
+    _meta: { ui: { visibility: ["app"] }, "hob/login": "poll" },
+  },
+  {
+    name: "hob_login_logout",
+    description: "Sign out of GitHub hob-bot.",
+    inputSchema: { type: "object", properties: {} },
+    _meta: { ui: { visibility: ["app"] }, "hob/login": "logout" },
+  },
+];
+
 export function createGitHubServer(options = {}) {
   const env = options.env || process.env;
-  const auth = options.auth || createAuthManager(env, { fetch: options.fetch });
+  const notify = options.notify || null;
+  const auth = options.auth || createAuthManager(env, {
+    fetch: options.fetch,
+    onAuthChanged: () => {
+      notify?.({ jsonrpc: "2.0", method: "notifications/tools/list_changed" });
+    },
+  });
   const remote = options.remote || new RemoteMcpClient({ url: auth.config.mcpUrl, fetch: options.fetch });
-  const internalTools = options.internalTools || [];
-  const internalHandlers = options.internalHandlers || new Map();
+  const internalTools = [...LOGIN_TOOLS, ...(options.internalTools || [])];
+  const internalHandlers = new Map([
+    ["hob_login_status", async () => structuredToolResult(await auth.loginStatus())],
+    ["hob_login_start", async () => structuredToolResult(await auth.loginStart())],
+    ["hob_login_poll", async () => structuredToolResult(await auth.loginPoll())],
+    ["hob_login_logout", async () => structuredToolResult(await auth.loginLogout())],
+    ...(options.internalHandlers ? options.internalHandlers.entries() : []),
+  ]);
   let cachedRemoteTools = [];
 
   async function listTools() {
