@@ -16,6 +16,10 @@ Each plugin lives in its own directory, named with its ID (letters, digits, `_` 
 
 The generated index lists each ID, directory path and relative file paths. Hob can also read an index without `files` over HTTP; in that case it retrieves only `plugin.json`, `mcp.json` and the declared icon. A git source includes the complete plugin directory.
 
+## Contributing
+
+To add a new plugin or update an existing one in the official source, see [CONTRIBUTING.md](CONTRIBUTING.md) ([简体中文](CONTRIBUTING.zh-CN.md)) for directory layout, provider dependency pinning, security requirements, and the PR workflow.
+
 ## License
 
 MIT; see [LICENSE](LICENSE).

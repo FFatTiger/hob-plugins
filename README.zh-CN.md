@@ -16,6 +16,10 @@
 
 生成的索引记录每个插件的 ID、目录路径和相对文件清单。HTTP 索引也可以不写 `files`，此时 Hob 只取 `plugin.json`、`mcp.json` 和声明的图标；git 源包含完整的插件目录。
 
+## 参与贡献
+
+向官方源提交新插件或更新现有插件，请参阅 [CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)（[English](CONTRIBUTING.md)），了解目录规范、供应商依赖锁死、安全审查标准与 PR 流程。
+
 ## 许可
 
 MIT，见 [LICENSE](LICENSE)。
