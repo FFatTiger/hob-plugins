@@ -2,6 +2,7 @@
 // Proxies GitHub's official remote MCP server while managing authentication, login, attribution, and command credentials.
 
 import { fileURLToPath } from "node:url";
+import { appendAttribution, shouldAttributeToolCall } from "./attribution.mjs";
 import { AuthError, createAuthManager, extractScopeFromArgs } from "./auth.mjs";
 import { RemoteMcpClient } from "./remote-mcp.mjs";
 
@@ -49,6 +50,21 @@ const LOGIN_TOOLS = [
   },
 ];
 
+const COMMAND_TOOLS = [
+  {
+    name: "command_credentials",
+    description: "Resolve GitHub token, commit author, and attribution settings for plugin CLI wrappers.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        owner: { type: "string", description: "Optional repository owner (user or organization)." },
+        repo: { type: "string", description: "Optional repository name." },
+      },
+    },
+    _meta: { ui: { visibility: ["app"] }, "hob/command": true },
+  },
+];
+
 export function createGitHubServer(options = {}) {
   const env = options.env || process.env;
   const notify = options.notify || null;
@@ -59,12 +75,16 @@ export function createGitHubServer(options = {}) {
     },
   });
   const remote = options.remote || new RemoteMcpClient({ url: auth.config.mcpUrl, fetch: options.fetch });
-  const internalTools = [...LOGIN_TOOLS, ...(options.internalTools || [])];
+  const internalTools = [...LOGIN_TOOLS, ...COMMAND_TOOLS, ...(options.internalTools || [])];
   const internalHandlers = new Map([
     ["hob_login_status", async () => structuredToolResult(await auth.loginStatus())],
     ["hob_login_start", async () => structuredToolResult(await auth.loginStart())],
     ["hob_login_poll", async () => structuredToolResult(await auth.loginPoll())],
     ["hob_login_logout", async () => structuredToolResult(await auth.loginLogout())],
+    ["command_credentials", async (args) => {
+      const scope = extractScopeFromArgs(args);
+      return structuredToolResult(await auth.resolveCommandCredentials(scope));
+    }],
     ...(options.internalHandlers ? options.internalHandlers.entries() : []),
   ]);
   let cachedRemoteTools = [];
@@ -112,8 +132,13 @@ export function createGitHubServer(options = {}) {
       return errorToolResult(error instanceof Error ? error.message : String(error));
     }
 
+    const forwardArgs = args && typeof args === "object" ? { ...args } : {};
+    if (auth.config.attribution && shouldAttributeToolCall(name, forwardArgs)) {
+      forwardArgs.body = appendAttribution(forwardArgs.body);
+    }
+
     try {
-      const result = await remote.callTool(tokenResult.token, name, args || {});
+      const result = await remote.callTool(tokenResult.token, name, forwardArgs);
       return result && typeof result === "object"
         ? (result.content === undefined ? { ...result, content: [] } : result)
         : { content: [] };

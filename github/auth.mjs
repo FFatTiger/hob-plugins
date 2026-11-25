@@ -6,6 +6,8 @@ import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, wri
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 
+import { HOB_BOT_CO_AUTHOR } from "./attribution.mjs";
+
 export const HOB_BOT_CLIENT_ID = "Iv23liZVDEIT17Ex36pI";
 export const HOB_BOT_INSTALL_URL = "https://github.com/apps/hob-bot/installations/new";
 export const REFRESH_BUFFER_MS = 5 * 60 * 1000;
@@ -114,6 +116,8 @@ export function createAuthManager(env = process.env, options = {}) {
   let cachedPrivateKey = null;
   let cachedAppInfo = null;
   const installationTokenCache = new Map(); // installationId -> { token, expiresAtMs }
+  const botUserCache = new Map(); // slug -> { id, login }
+  const userByTokenCache = new Map(); // token -> { id, login, name }
 
   // hob-bot device-code login state
   let storedAuth = undefined; // undefined = not loaded from disk yet; null = no file
@@ -489,6 +493,77 @@ export function createAuthManager(env = process.env, options = {}) {
     throw new AuthError(NO_AUTH_MESSAGE, { code: "no_auth" });
   }
 
+  async function getBotUser(slug, token) {
+    if (!slug) return null;
+    if (botUserCache.has(slug)) return botUserCache.get(slug);
+    const botLogin = `${slug}[bot]`;
+    try {
+      const user = await githubApi(`/users/${encodeURIComponent(botLogin)}`, { token, allow404: true });
+      if (user?.id !== undefined) {
+        const info = { id: user.id, login: botLogin };
+        botUserCache.set(slug, info);
+        return info;
+      }
+    } catch {
+      // Best effort: omit authorEmail if bot user lookup fails.
+    }
+    return null;
+  }
+
+  async function getUserForToken(token) {
+    if (userByTokenCache.has(token)) return userByTokenCache.get(token);
+    try {
+      const user = await githubApi("/user", { token });
+      if (user?.id !== undefined && user?.login) {
+        const info = { id: user.id, login: user.login, ...(user.name ? { name: user.name } : {}) };
+        if (userByTokenCache.size > 16) {
+          userByTokenCache.delete(userByTokenCache.keys().next().value);
+        }
+        userByTokenCache.set(token, info);
+        return info;
+      }
+    } catch {
+      // Best effort: still return token if /user lookup fails.
+    }
+    return null;
+  }
+
+  async function resolveCommandCredentials(scope = {}) {
+    const resolved = await resolveToken(scope);
+    let authorName;
+    let authorEmail;
+    let isHobBotSelf = false;
+
+    if (resolved.source === "app") {
+      const appInfo = await getAppInfo();
+      const slug = appInfo?.slug;
+      if (slug) {
+        isHobBotSelf = slug === "hob-bot";
+        authorName = `${slug}[bot]`;
+        const botUser = await getBotUser(slug, resolved.token);
+        if (botUser?.id !== undefined) {
+          authorEmail = `${botUser.id}+${slug}[bot]@users.noreply.github.com`;
+        }
+      }
+    } else {
+      const user = await getUserForToken(resolved.token);
+      if (user) {
+        authorName = user.name || user.login;
+        authorEmail = `${user.id}+${user.login}@users.noreply.github.com`;
+      }
+    }
+
+    const coAuthor = attribution && !isHobBotSelf ? HOB_BOT_CO_AUTHOR : undefined;
+
+    return {
+      token: resolved.token,
+      ...(authorName ? { authorName } : {}),
+      ...(authorEmail ? { authorEmail } : {}),
+      ...(coAuthor ? { coAuthor } : {}),
+      attribution,
+    };
+  }
+
   return {
     config: {
       pat,
@@ -511,5 +586,6 @@ export function createAuthManager(env = process.env, options = {}) {
     loginPoll,
     loginLogout,
     resolveToken,
+    resolveCommandCredentials,
   };
 }
