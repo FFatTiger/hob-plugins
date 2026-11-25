@@ -17,7 +17,9 @@ const BIN_DIR = join(GITHUB_DIR, "bin");
 async function startHobToolsBridge(serverEnv) {
   const mcpServer = createGitHubServer({ env: serverEnv });
   const expectedToken = "hob-tools-test-secret";
+  let calls = 0;
   const httpServer = createServer((req, res) => {
+    calls++;
     void (async () => {
       if (req.headers.authorization !== `Bearer ${expectedToken}`) {
         res.writeHead(401, { "content-type": "application/json" });
@@ -54,6 +56,7 @@ async function startHobToolsBridge(serverEnv) {
       HOB_TOOLS_URL: `http://127.0.0.1:${port}/`,
       HOB_TOOLS_TOKEN: expectedToken,
     },
+    get calls() { return calls; },
     close() {
       return new Promise((resolve) => httpServer.close(() => resolve()));
     },
@@ -177,6 +180,7 @@ test("bin/git：三种身份下的作者和 trailer、关闭署名、无身份�
 
   const corpRepo = initTempGitRepo("https://github.com/corp-org/web.git");
   const userRepo = initTempGitRepo("git@github.com:alice/demo.git");
+  const otherRepo = initTempGitRepo("https://git.example.org/team/app.git");
 
   try {
     // 1. App identity commit (also exercises -c and -C from another cwd!)
@@ -251,25 +255,36 @@ test("bin/git：三种身份下的作者和 trailer、关闭署名、无身份�
     assert.ok(noAuthLog.startsWith("Local User|local@example.com|"));
     assert.equal(noAuthLog.includes("Co-authored-by:"), false);
 
-    // 7. Verify credential helper injection when authenticated vs unauthenticated
-    const credCheckOn = await runBin("git", ["config", "--get-all", "credential.https://github.com.helper"], {
-      cwd: corpRepo.dir,
-      env: bridgeAll.env,
-    });
-    assert.equal(credCheckOn.status, 0);
-    assert.ok(credCheckOn.stdout.includes("git-credential-hob"));
+    // 7. Credential helper is attached to commands that talk to a remote, only with an identity.
+    //    A stand-in "real git" after the wrapper on PATH prints the arguments it receives.
+    const fakeGitDir = mkdtempSync(join(tmpdir(), "hob-fake-git-"));
+    const realGit = execFileSync("sh", ["-c", "command -v git"], { encoding: "utf8" }).trim();
+    writeFileSync(join(fakeGitDir, "git"), `#!/bin/sh\nfor a; do [ "$a" = remote ] && exec ${realGit} "$@"; done\necho "ARGS $*"\n`);
+    chmodSync(join(fakeGitDir, "git"), 0o755);
+    const fakePath = { PATH: `${BIN_DIR}${delimiter}${fakeGitDir}${delimiter}${process.env.PATH}` };
+    const pushOn = await runBin("git", ["push", "origin", "main"], { cwd: corpRepo.dir, env: { ...bridgeAll.env, ...fakePath } });
+    assert.equal(pushOn.status, 0, pushOn.stderr);
+    assert.ok(pushOn.stdout.includes("credential.https://github.com.helper="), pushOn.stdout);
+    assert.ok(pushOn.stdout.includes("git-credential-hob"));
+    assert.ok(pushOn.stdout.includes("credential.https://github.com.useHttpPath=true"));
+    const pushOff = await runBin("git", ["push", "origin", "main"], { cwd: corpRepo.dir, env: { ...bridgeNone.env, ...fakePath } });
+    assert.equal(pushOff.stdout.trim(), "ARGS push origin main");
+    rmSync(fakeGitDir, { recursive: true, force: true });
 
-    const credUsePath = await runBin("git", ["config", "--get", "credential.https://github.com.useHttpPath"], {
-      cwd: corpRepo.dir,
-      env: bridgeAll.env,
-    });
-    assert.equal(credUsePath.stdout.trim(), "true");
+    // 8. Local-only subcommands skip the plugin entirely (no credentials round trip)
+    const before = bridgeAll.calls;
+    const status = await runBin("git", ["status", "--short"], { cwd: corpRepo.dir, env: bridgeAll.env });
+    assert.equal(status.status, 0, status.stderr);
+    assert.equal(bridgeAll.calls, before);
 
-    const credCheckOff = await runBin("git", ["config", "--get-all", "credential.https://github.com.helper"], {
-      cwd: corpRepo.dir,
-      env: bridgeNone.env,
-    });
-    assert.equal(credCheckOff.stdout.includes("git-credential-hob"), false);
+    // 9. A repo whose remotes are all off github.com keeps its own author and gets no trailer
+    writeFileSync(join(otherRepo.dir, "g.txt"), "7\n");
+    execFileSync("git", ["add", "g.txt"], { cwd: otherRepo.dir, env: otherRepo.cleanEnv });
+    const otherCommit = await runBin("git", ["commit", "-m", "feat: elsewhere"], { cwd: otherRepo.dir, env: bridgeAll.env });
+    assert.equal(otherCommit.status, 0, otherCommit.stderr);
+    const otherLog = execFileSync("git", ["log", "-1", "--format=%an|%ae|%B"], { cwd: otherRepo.dir, encoding: "utf8" });
+    assert.ok(otherLog.startsWith("Local User|local@example.com|"));
+    assert.equal(otherLog.includes("Co-authored-by:"), false);
   } finally {
     await bridgeAll.close();
     await bridgePat.close();
@@ -278,6 +293,7 @@ test("bin/git：三种身份下的作者和 trailer、关闭署名、无身份�
     await fake.close();
     corpRepo.cleanup();
     userRepo.cleanup();
+    otherRepo.cleanup();
     keyTmp.cleanup();
     rmSync(dataDir, { recursive: true, force: true });
   }

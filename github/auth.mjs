@@ -244,7 +244,19 @@ export function createAuthManager(env = process.env, options = {}) {
     return `${webBase}/settings/apps`;
   }
 
+  // Every tool call and git push looks up the installation; remember answers (found or not) for
+  // a few minutes so a newly installed App is picked up soon without a lookup per call.
+  const installationCache = new Map();
   async function findAppInstallation(scope = {}) {
+    const key = `${scope.owner || ""}/${scope.repo || ""}`;
+    const hit = installationCache.get(key);
+    if (hit && now() < hit.until) return hit.value;
+    const value = await lookupAppInstallation(scope);
+    installationCache.set(key, { value, until: now() + 5 * 60 * 1000 });
+    return value;
+  }
+
+  async function lookupAppInstallation(scope) {
     const jwt = createJwt();
     const { owner, repo } = scope;
     if (owner && repo) {

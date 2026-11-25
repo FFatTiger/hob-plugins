@@ -76,13 +76,17 @@ export function detectGitHubRemote(realGit, cwd) {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     });
+    let remotes = 0;
     for (const line of list.split(/\r?\n/)) {
       const parts = line.trim().split(/\s+/);
       if (parts.length >= 2) {
+        remotes++;
         const parsed = parseGitHubRemote(parts[1]);
         if (parsed.owner) return parsed;
       }
     }
+    // Remotes exist but none is on github.com: callers leave this repo alone.
+    if (remotes) return { foreign: true };
   } catch {
     // Ignore errors outside a git repository.
   }

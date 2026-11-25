@@ -117,7 +117,11 @@ if (!realGit) {
 const rawArgs = process.argv.slice(2);
 const { effectiveCwd, subcommand, subIndex } = parseGitInvocation(rawArgs);
 
-if (!subcommand) {
+// Only commits (author, co-author) and commands that talk to a remote (credentials) need the
+// plugin; everything else (status, diff, log, ...) runs the real git without a round trip.
+const NEEDS_PLUGIN = new Set(["commit", "push", "pull", "fetch", "clone", "ls-remote", "submodule", "remote"]);
+
+if (!subcommand || !NEEDS_PLUGIN.has(subcommand)) {
   finishWith(await runPassthrough(realGit, rawArgs));
 } else {
   let scope = detectGitHubRemote(realGit, effectiveCwd);
@@ -131,7 +135,7 @@ if (!subcommand) {
     }
   }
 
-  const creds = await fetchHobCredentials(scope);
+  const creds = scope.foreign ? null : await fetchHobCredentials(scope);
   if (!creds?.token) {
     finishWith(await runPassthrough(realGit, rawArgs));
   } else {
