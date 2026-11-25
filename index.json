@@ -5,9 +5,25 @@
       "id": "github",
       "path": "github",
       "files": [
+        "attribution.mjs",
+        "auth.mjs",
+        "bin/gh",
+        "bin/git",
+        "bin/git-credential-hob",
+        "cli-helper.mjs",
         "icon.svg",
         "mcp.json",
-        "plugin.json"
+        "plugin.json",
+        "remote-mcp.mjs",
+        "server.mjs",
+        "test/app-auth.test.mjs",
+        "test/attribution-command.test.mjs",
+        "test/cli.test.mjs",
+        "test/compat.test.mjs",
+        "test/fake-github.mjs",
+        "test/login.test.mjs",
+        "test/manifest.test.mjs",
+        "test/mcp-client.mjs"
       ]
     },
     {
