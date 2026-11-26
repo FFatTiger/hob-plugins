@@ -1,7 +1,7 @@
 {
   "name": "agy-cli",
   "displayName": "Antigravity (本机 agy CLI)",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "通过运行 Hob 机器上的本机 agy CLI（ACP 协议）接入 Antigravity 订阅模型，支持检测/代装 CLI 与查看额度。",
   "homepage": "https://github.com/magpie-community/plugins/tree/main/packages/agy-cli",
   "extensions": {
@@ -11,7 +11,7 @@
       "sourceUrl": "https://github.com/magpie-community/plugins/tree/main/packages/agy-cli",
       "categories": ["providers"],
       "unofficial": true,
-      "reviewedVersion": "0.1.115",
+      "reviewedVersion": "0.1.140",
       "summary": {
         "zh": "走运行 Hob 机器上的本机 agy CLI 接入 Antigravity 订阅模型。",
         "en": "Connect Antigravity subscription models through the local agy CLI installed on the Hob host machine."
@@ -28,9 +28,9 @@
       "providers": [
         {
           "package": "@magpie-community/opencode-agy-cli-auth",
-          "version": "0.1.115",
-          "integrity": "sha512-d5N+CS6rvGWDxiKS4YX//LkHz9iYEnYk/tA3AWhAj/O4/A6T/REwvdABEEC1rknekFJERUaYTJ6Kd96qdq/nYw==",
-          "tarball": "https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-agy-cli-auth-0.1.115.tgz"
+          "version": "0.1.140",
+          "integrity": "sha512-bKALo7kNV9Igxq9ly9lNO/5k3BqCuDVkM4zJ58Yp9fQxos9k3PT/czb5Uocr2q2VbZlBa4WaJnjwngl2gODSMQ==",
+          "tarball": "https://raw.githubusercontent.com/magpie-community/plugins/dist/tgz/magpie-community-opencode-agy-cli-auth-0.1.140.tgz"
         }
       ]
     }
