@@ -1,7 +1,7 @@
 {
   "name": "bitwarden",
   "displayName": "Bitwarden",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "Keep logins in your Bitwarden vault (bitwarden.com, the EU cloud or a self-hosted server). Assistants can see which logins you have and ask you to save new ones on a card, but never the passwords: when a site needs a login, Hob fills it into the page itself after you approve. Hob logs in with your API key and unlocks the vault with your master password, both kept on this machine.",
   "homepage": "https://github.com/bitwarden/mcp-server",
   "userConfig": {

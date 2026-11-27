@@ -73,8 +73,18 @@ function ensureFolder(name) {
   return created;
 }
 
+function uriText(entry) {
+  return typeof entry === "string" ? entry : (typeof entry?.uri === "string" ? entry.uri : "");
+}
+
 function itemUri(item) {
-  return Array.isArray(item?.login?.uris) ? item.login.uris.map((entry) => typeof entry === "string" ? entry : entry?.uri).filter(Boolean) : [];
+  if (!Array.isArray(item?.login?.uris)) return [];
+  return item.login.uris.flatMap((entry) => {
+    if (typeof entry === "string") return entry ? [{ uri: entry }] : [];
+    if (!entry || typeof entry !== "object" || typeof entry.uri !== "string" || !entry.uri) return [];
+    const match = Number.isInteger(entry.match) && entry.match >= 0 && entry.match <= 5 ? entry.match : undefined;
+    return [match === undefined ? { uri: entry.uri } : { uri: entry.uri, match }];
+  });
 }
 
 function isLogin(item) {
@@ -125,7 +135,8 @@ function loginLabel(login, separator = "、") {
 // 列表卡的一行：第一行名称，第二行用户名 · 网站的主机名；右边小字写存了哪些内容（Hob 把 interactive_container 里第一行当标题、后面的当灰色小字）
 function loginRow(login) {
   const username = login.username || "（无用户名）";
-  const uri = login.uris[0] ? hostOf(login.uris[0]) : "（无网址）";
+  const firstUri = uriText(login.uris[0]);
+  const uri = firstUri ? hostOf(firstUri) : "（无网址）";
   return {
     tag: "interactive_container",
     elements: [
@@ -224,7 +235,7 @@ function existingLogin(values) {
   const name = valueOf(values, "name");
   const username = valueOf(values, "username");
   const url = valueOf(values, "url");
-  return getLogins({}).some((login) => login.name === name && login.username === username && login.uris.includes(url));
+  return getLogins({}).some((login) => login.name === name && login.username === username && login.uris.some((entry) => uriText(entry) === url));
 }
 
 function getItem(id) {
@@ -287,7 +298,7 @@ const secretInput = z.object({ id: z.string() });
 const generateInput = z.object({ length: z.number(), lowercase: z.boolean(), uppercase: z.boolean(), numbers: z.boolean(), symbols: z.boolean() });
 const saveInput = z.object({ id: z.string().optional(), name: z.string(), uris: z.array(z.string()), username: z.string(), password: z.string(), folder: z.string().optional() });
 
-const server = new McpServer({ name: "bitwarden", version: "2.0.2" }, { capabilities: { tools: {} } });
+const server = new McpServer({ name: "bitwarden", version: "2.1.0" }, { capabilities: { tools: {} } });
 
 server.registerTool("list_logins", {
   description: "列出 Bitwarden 里存的登录：名称、用户名、网址、所在文件夹、存了哪些内容（密码、两步验证）。不返回密码。参数 search 按名称、用户名或网址筛选，folder 只看某个文件夹，都可以不填。结果同时显示成一张列表卡给用户看。",
@@ -298,7 +309,7 @@ server.registerTool("list_logins", {
     return textResult(search ? `Bitwarden 里没有匹配「${search}」的登录。` : "Bitwarden 里没有登录。");
   }
   const shown = logins.slice(0, 50);
-  const lines = [`共 ${logins.length} 条`, ...shown.map((login) => `${login.name} · ${login.username} · ${login.uris[0] || ""} · ${login.folder || "无文件夹"} · 存了：${loginLabel(login)}`)];
+  const lines = [`共 ${logins.length} 条`, ...shown.map((login) => `${login.name} · ${login.username} · ${uriText(login.uris[0])} · ${login.folder || "无文件夹"} · 存了：${loginLabel(login)}`)];
   if (logins.length > 50) lines.push(`还有 ${logins.length - 50} 条，用 search 缩小范围`);
   return textResult(lines.join("\n"), { "hob/card": listCard(folder || "Bitwarden 里的登录", logins) });
 });

@@ -36,12 +36,12 @@ function initialDatabase() {
           username: "lin@example.com",
           password: LIST_SECRET,
           totp: "otpauth://totp/example",
-          uris: [{ uri: "https://forum.example.net/login" }],
+          uris: [{ uri: "https://forum.example.net/login", match: 1 }],
           extraField: "preserve me",
         },
       },
-      { id: "login-photo", type: 1, name: "摄影社区", login: { username: "linphoto", password: "photo-secret", uris: [{ uri: "https://photo.example.org" }] } },
-      { id: "login-book", type: 1, name: "二手书市", login: { username: "lin@example.com", password: "book-secret", uris: [{ uri: "https://books.example.com" }] } },
+      { id: "login-photo", type: 1, name: "摄影社区", login: { username: "linphoto", password: "photo-secret", uris: [{ uri: "https://photo.example.org", match: null }] } },
+      { id: "login-book", type: 1, name: "二手书市", login: { username: "lin@example.com", password: "book-secret", uris: [{ uri: "https://books.example.com" }, { uri: "https://books.example.com/admin", match: 0 }] } },
     ],
   };
 }
@@ -143,6 +143,8 @@ test("save_login 出表单，回调支持取消、保存、重复和错误", asy
     const database = JSON.parse(readFileSync(db, "utf8"));
     const created = database.items.find((item) => item.name === "新论坛");
     assert.equal(created.login.password, "new-password-secret");
+    assert.deepEqual(created.login.uris, [{ uri: "https://new.example" }]);
+    assert.equal("match" in created.login.uris[0], false);
     assert.equal(database.folders.at(-1).name, "新文件夹");
 
     const duplicate = await client.callTool({ name: "save_login_submit", arguments: {
@@ -169,6 +171,11 @@ test("五个凭据工具返回 structuredContent，支持取秘密、生成、�
     const listed = await client.callTool({ name: "credentials_list", arguments: {} });
     assert.deepEqual(listed.content, []);
     assert.equal(listed.structuredContent.logins.length, 3);
+    const byId = Object.fromEntries(listed.structuredContent.logins.map((entry) => [entry.id, entry]));
+    assert.deepEqual(byId["login-forum"].uris, [{ uri: "https://forum.example.net/login", match: 1 }]);
+    assert.deepEqual(byId["login-photo"].uris, [{ uri: "https://photo.example.org" }]);
+    assert.equal("match" in byId["login-photo"].uris[0], false);
+    assert.deepEqual(byId["login-book"].uris, [{ uri: "https://books.example.com" }, { uri: "https://books.example.com/admin", match: 0 }]);
     assert.ok(!resultJson(listed).includes(LIST_SECRET));
 
     const secret = await client.callTool({ name: "credentials_secret", arguments: { id: "login-forum" } });
