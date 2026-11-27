@@ -23,7 +23,7 @@ if (needCli || needSdk) {
 
 // 只把 bw 需要的变量交给它；主密码只在解锁那一步通过环境变量给
 const base = { ...process.env, BITWARDENCLI_APPDATA_DIR: join(BW_DATA, "bw") };
-for (const key of ["BW_SERVER", "BW_CLIENTID", "BW_CLIENTSECRET", "BW_PASSWORD", "BW_DATA", "BW_CLI_PATH", "BW_MCP_SDK_ROOT"]) delete base[key];
+for (const key of ["BW_SERVER", "BW_CLIENTID", "BW_CLIENTSECRET", "BW_PASSWORD", "BW_DATA", "BW_CLI_PATH", "BW_MCP_SDK_ROOT", "BW_DEFAULT_URI_MATCH"]) delete base[key];
 // 外来的 bw 如果是个 .mjs 脚本，用 node 跑它（和 server.mjs 的做法一样）
 const bw = (args, env = {}) => execFileSync(bwBin.endsWith(".mjs") ? process.execPath : bwBin, bwBin.endsWith(".mjs") ? [bwBin, ...args] : args, { env: { ...base, ...env }, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 const run = (args, env, what) => {

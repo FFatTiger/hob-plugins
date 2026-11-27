@@ -73,17 +73,31 @@ function ensureFolder(name) {
   return created;
 }
 
+const DEFAULT_MATCH_MODES = new Map([
+  ["基础域名", 0], ["0", 0],
+  ["主机", 1], ["1", 1],
+  ["开始于", 2], ["2", 2],
+  ["精确", 3], ["3", 3],
+  ["从不", 5], ["5", 5],
+]);
+
+function defaultUriMatch() {
+  const raw = String(process.env.BW_DEFAULT_URI_MATCH ?? "").trim();
+  return DEFAULT_MATCH_MODES.get(raw) ?? 0;
+}
+
 function uriText(entry) {
   return typeof entry === "string" ? entry : (typeof entry?.uri === "string" ? entry.uri : "");
 }
 
 function itemUri(item) {
   if (!Array.isArray(item?.login?.uris)) return [];
+  const fallback = defaultUriMatch();
   return item.login.uris.flatMap((entry) => {
-    if (typeof entry === "string") return entry ? [{ uri: entry }] : [];
+    if (typeof entry === "string") return entry ? [{ uri: entry, match: fallback }] : [];
     if (!entry || typeof entry !== "object" || typeof entry.uri !== "string" || !entry.uri) return [];
-    const match = Number.isInteger(entry.match) && entry.match >= 0 && entry.match <= 5 ? entry.match : undefined;
-    return [match === undefined ? { uri: entry.uri } : { uri: entry.uri, match }];
+    const match = Number.isInteger(entry.match) && entry.match >= 0 && entry.match <= 5 ? entry.match : fallback;
+    return [{ uri: entry.uri, match }];
   });
 }
 
@@ -298,7 +312,7 @@ const secretInput = z.object({ id: z.string() });
 const generateInput = z.object({ length: z.number(), lowercase: z.boolean(), uppercase: z.boolean(), numbers: z.boolean(), symbols: z.boolean() });
 const saveInput = z.object({ id: z.string().optional(), name: z.string(), uris: z.array(z.string()), username: z.string(), password: z.string(), folder: z.string().optional() });
 
-const server = new McpServer({ name: "bitwarden", version: "2.1.0" }, { capabilities: { tools: {} } });
+const server = new McpServer({ name: "bitwarden", version: "2.2.0" }, { capabilities: { tools: {} } });
 
 server.registerTool("list_logins", {
   description: "列出 Bitwarden 里存的登录：名称、用户名、网址、所在文件夹、存了哪些内容（密码、两步验证）。不返回密码。参数 search 按名称、用户名或网址筛选，folder 只看某个文件夹，都可以不填。结果同时显示成一张列表卡给用户看。",

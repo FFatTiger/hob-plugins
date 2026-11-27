@@ -1,14 +1,15 @@
 {
   "name": "bitwarden",
   "displayName": "Bitwarden",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Keep logins in your Bitwarden vault (bitwarden.com, the EU cloud or a self-hosted server). Assistants can see which logins you have and ask you to save new ones on a card, but never the passwords: when a site needs a login, Hob fills it into the page itself after you approve. Hob logs in with your API key and unlocks the vault with your master password, both kept on this machine.",
   "homepage": "https://github.com/bitwarden/mcp-server",
   "userConfig": {
     "BW_SERVER": { "type": "string", "title": "服务器地址", "description": "私有部署填你的地址，例如 https://vault.example.com；EU 云填 https://vault.bitwarden.eu；用 bitwarden.com 留空。" },
     "BW_CLIENTID": { "type": "string", "title": "API 密钥 client_id", "description": "网页版 设置 → 安全 → 密钥 → 查看 API 密钥。", "required": true },
     "BW_CLIENTSECRET": { "type": "string", "title": "API 密钥 client_secret", "required": true, "sensitive": true },
-    "BW_PASSWORD": { "type": "string", "title": "主密码", "description": "用来解锁密码库，只交给本机的 Bitwarden 命令行。", "required": true, "sensitive": true }
+    "BW_PASSWORD": { "type": "string", "title": "主密码", "description": "用来解锁密码库，只交给本机的 Bitwarden 命令行。", "required": true, "sensitive": true },
+    "BW_DEFAULT_URI_MATCH": { "type": "string", "title": "默认匹配方式", "description": "在 Bitwarden 里单独设过匹配方式的网址，以那里为准；没设过的用这里的。", "default": "基础域名", "options": ["基础域名", "主机", "开始于", "精确", "从不"] }
   },
   "extensions": { "com.hob.plugins": { "icon": "icon.svg", "publisher": "Bitwarden", "categories": ["productivity"] } }
 }

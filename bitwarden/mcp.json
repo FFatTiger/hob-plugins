@@ -8,7 +8,8 @@
         "BW_SERVER": "${user_config.BW_SERVER}",
         "BW_CLIENTID": "${user_config.BW_CLIENTID}",
         "BW_CLIENTSECRET": "${user_config.BW_CLIENTSECRET}",
-        "BW_PASSWORD": "${user_config.BW_PASSWORD}"
+        "BW_PASSWORD": "${user_config.BW_PASSWORD}",
+        "BW_DEFAULT_URI_MATCH": "${user_config.BW_DEFAULT_URI_MATCH}"
       }
     }
   }

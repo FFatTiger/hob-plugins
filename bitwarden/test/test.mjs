@@ -59,6 +59,7 @@ async function withClient(options, callback) {
       BW_FAKE_DB: db,
       BW_MCP_SDK_ROOT: sdkRoot,
       ...(options?.launcher ? { BW_DATA: root, BW_FAKE_APPDATA: join(root, "bw"), BW_CLIENTID: "fake-client", BW_CLIENTSECRET: "fake-secret", BW_PASSWORD: "fake-password" } : {}),
+      ...(options?.defaultUriMatch !== undefined ? { BW_DEFAULT_URI_MATCH: options.defaultUriMatch } : {}),
       BW_SESSION: "fake-session",
       ...(options?.fail ? { BW_FAKE_FAIL: "1" } : {}),
     },
@@ -173,9 +174,8 @@ test("五个凭据工具返回 structuredContent，支持取秘密、生成、�
     assert.equal(listed.structuredContent.logins.length, 3);
     const byId = Object.fromEntries(listed.structuredContent.logins.map((entry) => [entry.id, entry]));
     assert.deepEqual(byId["login-forum"].uris, [{ uri: "https://forum.example.net/login", match: 1 }]);
-    assert.deepEqual(byId["login-photo"].uris, [{ uri: "https://photo.example.org" }]);
-    assert.equal("match" in byId["login-photo"].uris[0], false);
-    assert.deepEqual(byId["login-book"].uris, [{ uri: "https://books.example.com" }, { uri: "https://books.example.com/admin", match: 0 }]);
+    assert.deepEqual(byId["login-photo"].uris, [{ uri: "https://photo.example.org", match: 0 }]);
+    assert.deepEqual(byId["login-book"].uris, [{ uri: "https://books.example.com", match: 0 }, { uri: "https://books.example.com/admin", match: 0 }]);
     assert.ok(!resultJson(listed).includes(LIST_SECRET));
 
     const secret = await client.callTool({ name: "credentials_secret", arguments: { id: "login-forum" } });
@@ -201,4 +201,23 @@ test("五个凭据工具返回 structuredContent，支持取秘密、生成、�
     assert.deepEqual(deleted.structuredContent ?? {}, {});
     assert.ok(!JSON.parse(readFileSync(db, "utf8")).items.some((item) => item.id === "login-social"));
   });
+});
+
+test("默认匹配方式配置只作用于未单独设置 match 的网址，已设置的保留原值", async () => {
+  await withClient({ launcher: true, defaultUriMatch: "主机" }, async (client) => {
+    const listed = await client.callTool({ name: "credentials_list", arguments: {} });
+    const byId = Object.fromEntries(listed.structuredContent.logins.map((entry) => [entry.id, entry]));
+    // 已单独设了 match: 1 / match: 0 的保持不变，match: null 和没设 match 的填默认「主机」(1)
+    assert.deepEqual(byId["login-forum"].uris, [{ uri: "https://forum.example.net/login", match: 1 }]);
+    assert.deepEqual(byId["login-photo"].uris, [{ uri: "https://photo.example.org", match: 1 }]);
+    assert.deepEqual(byId["login-book"].uris, [{ uri: "https://books.example.com", match: 1 }, { uri: "https://books.example.com/admin", match: 0 }]);
+  });
+
+  for (const [label, expected] of [["开始于", 2], ["精确", 3], ["从不", 5]]) {
+    await withClient({ defaultUriMatch: label }, async (client) => {
+      const listed = await client.callTool({ name: "credentials_list", arguments: {} });
+      const photo = listed.structuredContent.logins.find((entry) => entry.id === "login-photo");
+      assert.deepEqual(photo.uris, [{ uri: "https://photo.example.org", match: expected }]);
+    });
+  }
 });
